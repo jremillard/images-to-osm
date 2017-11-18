@@ -1,0 +1,12 @@
+bleach==1.5.0
+html5lib==0.9999999
+Markdown==2.6.9
+numpy==1.13.3
+overpy==0.4
+pkg-resources==0.0.0
+protobuf==3.4.0
+Shapely==1.6.2.post1
+six==1.11.0
+tensorflow-gpu==1.3.0
+tensorflow-tensorboard==0.1.8
+Werkzeug==0.12.2
