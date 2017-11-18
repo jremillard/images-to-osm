@@ -4,8 +4,11 @@ __pycache__/
 *$py.class
 
 secrets.py
-train
+train-images
+logs
+kernel*.json
 
 *.csv
 *.jpeg
 *.jpg
+*.h5

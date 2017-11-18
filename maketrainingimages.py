@@ -1,4 +1,4 @@
-import config as cfg
+import imagestoosm.config as cfg
 import os
 import QuadKey.quadkey as quadkey
 import numpy as np
@@ -24,8 +24,9 @@ minFeatureClip = 0.3
 
 # training will do flips, intensity, and color shifts if needed
 
-os.system("rm -R train")
-os.mkdir("train")
+
+os.system("rm -R " + cfg.trainDir)
+os.mkdir(cfg.trainDir)
 
 # load up the OSM features into hash of arrays of polygons, in pixels
 features = {}
@@ -94,8 +95,8 @@ for root, subFolders, files in os.walk(cfg.rootTileDir):
         
         imageBoundingBoxPoly = geometry.Polygon(pts)
 
-        if (os.path.exists( "train/%s" % (imageWriteCounter) ) == False) :
-            os.mkdir( "train/%s" % (imageWriteCounter) )
+        if (os.path.exists( "%s/%05d" % (cfg.trainDir,imageWriteCounter) ) == False) :
+            os.mkdir( "%s/%05d" % (cfg.trainDir,imageWriteCounter) )
 
         featureMask = np.zeros((maxImageSize, maxImageSize), dtype=np.uint8)
         featureCountTotal = 0
@@ -120,14 +121,14 @@ for root, subFolders, files in os.walk(cfg.rootTileDir):
                         featureMask.fill(0)
                         rr, cc = draw.polygon(xs,ys,(maxImageSize,maxImageSize))
                         featureMask[cc,rr] = 255
-                        io.imsave("train/%s/%05d-%s-%d.png" % (imageWriteCounter,imageWriteCounter,featureType,featureCount),featureMask)
+                        io.imsave("%s/%05d/%05d-%s-%d.png" % (cfg.trainDir,imageWriteCounter,imageWriteCounter,featureType,featureCount),featureMask)
                         featureCount += 1
                         featureCountTotal += 1
 
         if ( featureCountTotal > 0) :
-            io.imsave("train/%s/%05d.jpg" % (imageWriteCounter,imageWriteCounter),image,quality=100)
+            io.imsave("%s/%05d/%05d.jpg" % (cfg.trainDir,imageWriteCounter,imageWriteCounter),image,quality=100)
             
-            with open("train/%s/%05d.txt" % (imageWriteCounter,imageWriteCounter), "wt") as text_file:
+            with open("%s/%05d/%05d.txt" % (cfg.trainDir,imageWriteCounter,imageWriteCounter), "wt") as text_file:
                 text_file.write( "Location of Image\n%0.8f,%0.8f\n" % qkRoot.to_geo())
 
             imageWriteCounter += 1

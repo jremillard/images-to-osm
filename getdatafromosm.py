@@ -13,7 +13,7 @@ def saveOsmData(query) :
 
     for way in result.ways:
 
-        # "leisure=pitch,sport=" 
+        # "leisure=pitch,sport=" , don't use "-" char" in featureDirectoryName
         featureDirectoryName = way.tags.get("sport")
 
         csvDirectoryName = os.path.join(cfg.rootOsmDir,featureDirectoryName)
