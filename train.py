@@ -100,14 +100,14 @@ model.train(dataset_train, dataset_val,
 print("Training Resnet layer 4+")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 10,
-            epochs=50,
+            epochs=100,
             layers='4+')
 
 # Training - Stage 3
 # Finetune layers from ResNet stage 3 and up
-print("Training Resnet layer 3+")
+print("Training all")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 100,
-            epochs=100,
+            epochs=500,
             layers='all')
             

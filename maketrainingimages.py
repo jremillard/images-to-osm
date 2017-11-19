@@ -45,12 +45,15 @@ for classDir in os.listdir(cfg.rootOsmDir) :
 
                 pts.append(pixel)
 
-            p = geometry.Polygon(pts)
+            feature = {
+                "geometry" : geometry.Polygon(pts),
+                "filename" : fullPath
+            }
 
             if ( (classDir in features) == False) :
                 features[classDir] = []
 
-            features[classDir].append( p )
+            features[classDir].append( feature )
 
 imageWriteCounter = 0
 for root, subFolders, files in os.walk(cfg.rootTileDir):
@@ -100,13 +103,14 @@ for root, subFolders, files in os.walk(cfg.rootTileDir):
 
         featureMask = np.zeros((maxImageSize, maxImageSize), dtype=np.uint8)
         featureCountTotal = 0
+        usedFileNames = []
         for featureType in features :
             featureCount = 0
             for feature in features[featureType] :
-                if ( imageBoundingBoxPoly.intersects( feature) ) :
-                    area = feature.area
+                if ( imageBoundingBoxPoly.intersects( feature['geometry']) ) :
+                    area = feature['geometry'].area
 
-                    xs, ys = feature.exterior.coords.xy
+                    xs, ys = feature['geometry'].exterior.coords.xy
                     xs = [ x-tilePixel[0] for x in xs]
                     ys = [ y-tilePixel[1] for y in ys]
     
@@ -125,6 +129,7 @@ for root, subFolders, files in os.walk(cfg.rootTileDir):
                         rr, cc = draw.polygon(xs,ys,(maxImageSize,maxImageSize))
                         featureMask[cc,rr] = 255
                         io.imsave("%s/%05d/%05d-%s-%d.png" % (cfg.trainDir,imageWriteCounter,imageWriteCounter,featureType,featureCount),featureMask)
+                        usedFileNames.append( feature['filename'] )
                         featureCount += 1
                         featureCountTotal += 1
 
@@ -132,8 +137,11 @@ for root, subFolders, files in os.walk(cfg.rootTileDir):
             io.imsave("%s/%05d/%05d.jpg" % (cfg.trainDir,imageWriteCounter,imageWriteCounter),image,quality=100)
             
             with open("%s/%05d/%05d.txt" % (cfg.trainDir,imageWriteCounter,imageWriteCounter), "wt") as text_file:
-                text_file.write( "Location of Image\n%0.8f,%0.8f\n" % qkRoot.to_geo())
-
+                text_file.write( "%s\n" % (str(qkRoot)))
+                text_file.write( "%0.8f,%0.8f\n" % qkRoot.to_geo())
+                for f in usedFileNames :
+                    text_file.write( "%s\n" % (f))
+                    
             imageWriteCounter += 1
 
             print("%s - %s - tiles %d - features %d" % (os.path.join(root, file), quadKeyStr,count, featureCountTotal))
