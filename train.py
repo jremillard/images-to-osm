@@ -92,7 +92,7 @@ elif init_with == "last":
 print("Training network heads")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE,
-            epochs=4,
+            epochs=10,
             layers='heads')
 
 # Training - Stage 2

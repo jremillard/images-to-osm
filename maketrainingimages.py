@@ -107,12 +107,15 @@ for root, subFolders, files in os.walk(cfg.rootTileDir):
                     area = feature.area
 
                     xs, ys = feature.exterior.coords.xy
-                    xs = [ min( max( x -tilePixel[0],0),maxImageSize) for x in xs]
-                    ys = [ min( max( y -tilePixel[1],0),maxImageSize) for y in ys]
+                    xs = [ x-tilePixel[0] for x in xs]
+                    ys = [ y-tilePixel[1] for y in ys]
+    
+                    xsClipped = [ min( max( x,0),maxImageSize) for x in xs]
+                    ysClipped = [ min( max( y,0),maxImageSize) for y in ys]
 
                     pts2 = []
                     for i in range(len(xs)) :
-                        pts2.append( (xs[i],ys[i] ) )
+                        pts2.append( (xsClipped[i],ysClipped[i] ) )
 
                     clippedPoly = geometry.Polygon(pts2)
                     newArea = clippedPoly.area

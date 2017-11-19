@@ -1,6 +1,6 @@
 import sys
 import overpy
-import config as cfg
+import imagestoosm.config as cfg
 import os
 
 api = overpy.Overpass()

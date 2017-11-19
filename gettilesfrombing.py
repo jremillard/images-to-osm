@@ -7,8 +7,8 @@ import os.path
 import csv
 import QuadKey.quadkey as quadkey
 import shutil
-import config as cfg
-import secrets as secrets
+import imagestoosm.config as cfg
+import imagestoosm.secrets as secrets
 from random import random
 from time import sleep
 
@@ -40,38 +40,44 @@ for classDir in os.listdir(cfg.rootOsmDir) :
 
             neededTile = False
             for row in csveader:
-    
-                qk = quadkey.from_geo((float(row[0]),float(row[1])), cfg.tileZoom)
 
-                qkStr = str(qk)
+                tilePixel = quadkey.TileSystem.geo_to_pixel((float(row[0]),float(row[1])), cfg.tileZoom)
 
-                tileCacheDir = os.path.join(bingTilesDir,qkStr[-3:])
-            
-                if ( os.path.exists(tileCacheDir) == False) :
-                    os.mkdir( tileCacheDir)
+                for x in range(-2,3) :
+                    for y in range(-2,3) :
+                        pixel = ( tilePixel[0] + 256*x, tilePixel[1]+256*y)
+                        geo = quadkey.TileSystem.pixel_to_geo(pixel, cfg.tileZoom)
+                        qk = quadkey.from_geo(geo,cfg.tileZoom)
 
-                tileFileName = "%s/%s.jpg" % (tileCacheDir, qkStr)
+                        qkStr = str(qk)
 
-                if ( os.path.exists(tileFileName) ) :                            
-                    # already downloaded
-                    ok = 1; 
-                else :
-                    print("T",end='')
-                    url = tileUrlTemplate.replace("{subdomain}",imageDomains[0])
-                    url = url.replace("{quadkey}",qkStr)
-                    url = "%s&key=%s" % (url,secrets.bingKey)
-
-                    response = requests.get(url,stream=True)
+                        tileCacheDir = os.path.join(bingTilesDir,qkStr[-3:])
                     
-                    with open(tileFileName,'wb') as out_file:
-                        shutil.copyfileobj(response.raw, out_file)
+                        if ( os.path.exists(tileCacheDir) == False) :
+                            os.mkdir( tileCacheDir)
 
-                    del response
-                    neededTile = True
+                        tileFileName = "%s/%s.jpg" % (tileCacheDir, qkStr)
+
+                        if ( os.path.exists(tileFileName) ) :                            
+                            # already downloaded
+                            ok = 1; 
+                        else :
+                            print("T",end='')
+                            url = tileUrlTemplate.replace("{subdomain}",imageDomains[0])
+                            url = url.replace("{quadkey}",qkStr)
+                            url = "%s&key=%s" % (url,secrets.bingKey)
+
+                            response = requests.get(url,stream=True)
+                            
+                            with open(tileFileName,'wb') as out_file:
+                                shutil.copyfileobj(response.raw, out_file)
+
+                            del response
+                            neededTile = True
                     
             print("")
             
             if ( neededTile ):
-                sleep(random()*5)
+                sleep(random()*3)
 
 
