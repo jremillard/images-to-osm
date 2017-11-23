@@ -98,9 +98,6 @@ for root, subFolders, files in os.walk(cfg.rootTileDir):
         
         imageBoundingBoxPoly = geometry.Polygon(pts)
 
-        if (os.path.exists( "%s/%05d" % (cfg.trainDir,imageWriteCounter) ) == False) :
-            os.mkdir( "%s/%05d" % (cfg.trainDir,imageWriteCounter) )
-
         featureMask = np.zeros((maxImageSize, maxImageSize), dtype=np.uint8)
         featureCountTotal = 0
         usedFileNames = []
@@ -125,6 +122,10 @@ for root, subFolders, files in os.walk(cfg.rootTileDir):
                     newArea = clippedPoly.area
 
                     if ( newArea/area > minFeatureClip) :
+
+                        if (os.path.exists( "%s/%05d" % (cfg.trainDir,imageWriteCounter) ) == False) :
+                            os.mkdir( "%s/%05d" % (cfg.trainDir,imageWriteCounter) )
+                        
                         featureMask.fill(0)
                         rr, cc = draw.polygon(xs,ys,(maxImageSize,maxImageSize))
                         featureMask[cc,rr] = 255

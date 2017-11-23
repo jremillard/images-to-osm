@@ -40,7 +40,7 @@ class OsmModelConfig(Config):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 2
 
-    STEPS_PER_EPOCH = 5000 // IMAGES_PER_GPU
+    STEPS_PER_EPOCH = 12000 // IMAGES_PER_GPU
 
     # Number of classes (including background)
     NUM_CLASSES = 1 + len(featureNames)  # background + featureType's

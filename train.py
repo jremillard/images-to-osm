@@ -108,6 +108,6 @@ model.train(dataset_train, dataset_val,
 print("Training all")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE / 100,
-            epochs=500,
+            epochs=1000,
             layers='all')
             
