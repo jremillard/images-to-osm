@@ -21,11 +21,11 @@ import visualize
 from model import log
 
 featureNames = {
-    "baseball":1,
-    "american_football":2,
-    "basketball":3,
-    "soccer":4,
-    "tennis":5
+#    "baseball":1,
+#    "american_football":2,
+    "basketball":1,
+#    "soccer":4,
+    "tennis":2
 }
 
 class OsmModelConfig(Config):
@@ -34,12 +34,17 @@ class OsmModelConfig(Config):
     to the toy shapes dataset.
     """
     # Give the configuration a recognizable name
-    NAME = "OSM Images"
+    NAME = "OSM Images BB TN"
 
     # Batch size is (GPUs * images/GPU).
     GPU_COUNT = 1
     IMAGES_PER_GPU = 2
+    LEARNING_RATE = 2e-4
 
+    # 2 minutes
+    #STEPS_PER_EPOCH = 100 // IMAGES_PER_GPU
+
+    # 1 hour epoch
     STEPS_PER_EPOCH = 12000 // IMAGES_PER_GPU
 
     # Number of classes (including background)
@@ -54,6 +59,8 @@ class OsmModelConfig(Config):
     # few objects. Aim to allow ROI sampling to pick 33% positive ROIs.
     #TRAIN_ROIS_PER_IMAGE = 64
     #DETECTION_MAX_INSTANCES = 64
+
+    VALIDATION_STEPS = 100
 
 class OsmImagesDataset(utils.Dataset):
 
@@ -89,7 +96,7 @@ class OsmImagesDataset(utils.Dataset):
         for filePath in glob.glob(wildcard): 
             filename = os.path.split(filePath)[1] 
             parts = filename.split( "-")
-            if ( len(parts) == 3) : 
+            if ( len(parts) == 3) and parts[1] in featureNames: 
                 maskCount += 1
 
         mask = np.zeros([info['height'], info['width'], maskCount], dtype=np.uint8)
@@ -99,7 +106,7 @@ class OsmImagesDataset(utils.Dataset):
         for filePath in glob.glob(wildcard): 
             filename = os.path.split(filePath)[1] 
             parts = filename.split( "-")
-            if ( len(parts) == 3) : 
+            if ( len(parts) == 3) and parts[1] in featureNames: 
                 imgPath = filePath
                 mask[:, :, count] = skimage.io.imread(filePath)
                 class_ids[count] = featureNames[parts[1]]

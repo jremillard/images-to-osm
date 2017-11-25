@@ -84,24 +84,25 @@ elif init_with == "coco":
                                 "mrcnn_bbox", "mrcnn_mask"])
 elif init_with == "last":
     # Load the last model you trained and continue training
+    print(model.find_last()[1])
     model.load_weights(model.find_last()[1], by_name=True)
 
-
-# Training - Stage 1
-# Adjust epochs and layers as needed
-print("Training network heads")
-model.train(dataset_train, dataset_val,
-            learning_rate=config.LEARNING_RATE,
-            epochs=10,
-            layers='heads')
+if ( init_with != "last") :
+    # Training - Stage 1
+    # Adjust epochs and layers as needed
+    print("Training network heads")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE,
+                epochs=4,
+                layers='heads')
 
 # Training - Stage 2
 # Finetune layers from ResNet stage 4 and up
-print("Training Resnet layer 4+")
+print("Training Resnet layer 5+")
 model.train(dataset_train, dataset_val,
-            learning_rate=config.LEARNING_RATE / 10,
+            learning_rate=config.LEARNING_RATE/10,
             epochs=100,
-            layers='4+')
+            layers='5+')
 
 # Training - Stage 3
 # Finetune layers from ResNet stage 3 and up
