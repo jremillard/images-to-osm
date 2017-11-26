@@ -21,11 +21,11 @@ import visualize
 from model import log
 
 featureNames = {
-#    "baseball":1,
+    "baseball":1,
 #    "american_football":2,
-    "basketball":1,
+    "basketball":2,
 #    "soccer":4,
-    "tennis":2
+    "tennis":3
 }
 
 class OsmModelConfig(Config):
@@ -34,12 +34,12 @@ class OsmModelConfig(Config):
     to the toy shapes dataset.
     """
     # Give the configuration a recognizable name
-    NAME = "OSM Images BB TN"
+    NAME = "OSM Images Baseball,Basketball,Tennis"
 
     # Batch size is (GPUs * images/GPU).
     GPU_COUNT = 1
     IMAGES_PER_GPU = 2
-    LEARNING_RATE = 2e-4
+    LEARNING_RATE = 0.002
 
     # 2 minutes
     #STEPS_PER_EPOCH = 100 // IMAGES_PER_GPU
