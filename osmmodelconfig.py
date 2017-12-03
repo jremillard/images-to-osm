@@ -55,6 +55,9 @@ class OsmModelConfig(Config):
     IMAGE_MIN_DIM = 256*TILES
     IMAGE_MAX_DIM = 256*TILES
 
+    MINI_MASK_SHAPE = (128, 128) 
+    #MASK_SHAPE = (IMAGE_MIN_DIM, IMAGE_MIN_DIM) 
+
     # Reduce training ROIs per image because the images are small and have
     # few objects. Aim to allow ROI sampling to pick 33% positive ROIs.
     #TRAIN_ROIS_PER_IMAGE = 64
