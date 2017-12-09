@@ -86,9 +86,13 @@ for root, subFolders, files in os.walk(cfg.rootTileDir):
                 tileFileName = "%s/%s.jpg" % (tileCacheDir, qkStr)
 
                 if ( os.path.exists(tileFileName) ) :
-                    image[ y*256 : (y+1)*256, x*256 : (x+1)*256,0:3 ] = io.imread(tileFileName )
-                    count += 1
-
+                    try:
+                        image[ y*256 : (y+1)*256, x*256 : (x+1)*256,0:3 ] = io.imread(tileFileName )
+                        count += 1
+                    except:
+                        # try to get the tile again next time.
+                        os.remove( tileFileName)
+                        
 
         pts = []
         pts.append( ( tilePixel[0]+0,tilePixel[1]+0 ) )

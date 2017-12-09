@@ -93,16 +93,16 @@ if ( init_with != "last") :
     print("Training network heads")
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs=4,
+                epochs=10,
                 layers='heads')
 
 # Training - Stage 2
 # Finetune layers from ResNet stage 4 and up
-print("Training Resnet layer 5+")
+print("Training Resnet layer 3+")
 model.train(dataset_train, dataset_val,
             learning_rate=config.LEARNING_RATE/10,
             epochs=100,
-            layers='5+')
+            layers='3+')
 
 # Training - Stage 3
 # Finetune layers from ResNet stage 3 and up
