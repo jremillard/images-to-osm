@@ -90,7 +90,7 @@ class OsmImagesDataset(utils.Dataset):
         """
         info = self.image_info[image_id]
 
-        imgDir = os.path.join( self.ROOT_DIR, osmcfg.trainDir,"%05d" % (image_id))
+        imgDir = os.path.join( self.ROOT_DIR, osmcfg.trainDir,info['id'])
         wildcard = os.path.join( imgDir,"*.png")
 
         # 00015-american_football-0.png  00015-baseball-0.png  00015-baseball-1.png  00015-baseball-2.png  00015-baseball-3.png  00015-basketball-0.png  00015-basketball-1.png  00015.jpg  00015.txt
