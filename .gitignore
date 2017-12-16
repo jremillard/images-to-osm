@@ -1,8 +1,9 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+temp/
 *.py[cod]
 *$py.class
-
+all.log
 secrets.py
 train-images
 logs

@@ -125,7 +125,7 @@ for root, subFolders, files in os.walk(cfg.rootTileDir):
                     clippedPoly = geometry.Polygon(pts2)
                     newArea = clippedPoly.area
 
-                    if ( newArea/area > minFeatureClip) :
+                    if ( area > 0 and newArea/area > minFeatureClip) :
 
                         if (os.path.exists( "%s/%05d" % (cfg.trainDir,imageWriteCounter) ) == False) :
                             os.mkdir( "%s/%05d" % (cfg.trainDir,imageWriteCounter) )
