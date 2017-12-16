@@ -7,11 +7,11 @@ The paper claimed state of the art performance for detecting instance segmentati
 
 Using Mask R-CNN successfully on a new data set would be a good indication that the algorithm is generic enough to be applicable on many problems. However, the number of publicly available data sets with enough images to train this algorithm are limited because collecting and annotating data for 50,000+ images is expensive and time consuming. 
 
-The opportunity of working with cutting edge AI algorithms and my favorite hobby was too much to pass up. The OpenStreetMap project can come to the rescue. Microsoft's Bing tiles combined with the OpenStreetMap data is a good source of segmentation mask data!
+Microsoft's Bing tiles combined with the OpenStreetMap data is a good source of segmentation mask data. The opportunity of working with cutting edge AI algorithms and my favorite hobby was too much to pass up. The OpenStreetMap project can come to the rescue. 
 
 ## Samples Images
 
-Mask R-CNN finding baseballs, basketball, and tennis fields in Bing images.
+Mask R-CNN finding baseball, basketball, and tennis fields in Bing images.
 
 ![OSM Mask R-CNN sample 1](/sample-images/sample1.png)
 ![OSM Mask R-CNN sample 2](/sample-images/sample2.png)
@@ -31,19 +31,18 @@ Sport fields are a good fit for the Mask R-CNN algorithm.
 
 ## Training with OSM
 
-The stretch goal for this project is to train a network that is at or past human level performance and to completely map the sports fields in Massachusetts in OSM. The problem is that the existing data in OSM is not of high enough quality to train any algorithm to human level performance.  The plan is to iteratively train, feed corrections back to OSM, and re-train, bootstrapping the algorithm and OSM together. Hopefully a virtuous circle between OSM and the algorithm will form.
+The stretch goal for this project is to train a network at human level performance and to completely map the sports fields in Massachusetts in OSM. The problem is that the existing data in OSM is not of high enough quality to train any algorithm to human level performance.  The plan is to iteratively train, feed corrections back to OSM, and re-train, bootstrapping the algorithm and OSM together. Hopefully a virtuous circle between OSM and the algorithm will form.
 
 ## Running
 
-The entire training workflow is in the trainall.py script, which calls the following scripts in 
-sequence.
+The entire training workflow is in the trainall.py script, which calls the following scripts in sequence.
 
 1. getdatafromosm.py uses overpass to download the data for the sports fields.
 2. gettilesfrombing.py uses the downloaded osm data, and matching bing tiles.
 3. maketrainingimages.py collects the osm data, and the bing tiles into a collection of training images and masks.
 4. train.py actually runs training for the Mask R-CNN algorithm.
 
-Note if you want to run this yourself. I am using a GeForce GTX 1080 with 8GB of memory. It takes 4 days to do a "light" training using the existing weights from Matterport.
+Note if you want to run this yourself. I am using a GeForce GTX 1080 with 8GB of memory. It takes 4 days to do a "light" training using the existing weights from Matterport. 
 
 ## Convert Results to OSM File
 
