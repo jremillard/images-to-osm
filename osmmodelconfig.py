@@ -22,10 +22,10 @@ from model import log
 
 featureNames = {
     "baseball":1,
-#    "american_football":2,
     "basketball":2,
-#    "soccer":4,
     "tennis":3
+#    "american_football":4,
+#    "soccer":5,
 }
 
 class OsmModelConfig(Config):

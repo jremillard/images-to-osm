@@ -45,15 +45,24 @@ for classDir in os.listdir(cfg.rootOsmDir) :
 
                 pts.append(pixel)
 
-            feature = {
-                "geometry" : geometry.Polygon(pts),
-                "filename" : fullPath
-            }
+            poly = geometry.Polygon(pts);
 
-            if ( (classDir in features) == False) :
-                features[classDir] = []
+            areaMeters = poly.area * 0.596 *0.596;
 
-            features[classDir].append( feature )
+            # don't learn against baseball fields that are outlines just on the
+            # diamond. They are tagged wrong, don't want to teach the NN that this 
+            # is correct. There are > 1000 of them in the OSM DB, we can't avoid 
+            # them.
+            if ( classDir != "baseball" or areaMeters > 2500) :                
+                feature = {
+                    "geometry" : poly,
+                    "filename" : fullPath
+                }
+
+                if ( (classDir in features) == False) :
+                    features[classDir] = []
+
+                features[classDir].append( feature )
 
 imageWriteCounter = 0
 for root, subFolders, files in os.walk(cfg.rootTileDir):
