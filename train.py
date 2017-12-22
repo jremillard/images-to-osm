@@ -1,13 +1,7 @@
 
 # coding: utf-8
 
-# # Mask R-CNN - Train on Shapes Dataset
-# 
-# 
-# This notebook shows how to train Mask R-CNN on your own dataset. To keep things simple we use a synthetic dataset of shapes (squares, triangles, and circles) which enables fast training. You'd still need a GPU, though, because the network backbone is a Resnet101, which would be too slow to train on a CPU. On a GPU, you can start to get okay-ish results in a few minutes, and good results in less than an hour.
-# 
-# The code of the *Shapes* dataset is included below. It generates images on the fly, so it doesn't require downloading any data. And it can generate images of any size, so we pick a small image size to train faster. 
-
+# hacked up from the shapes example file.
 
 import sys
 sys.path.append("Mask_RCNN")
@@ -96,15 +90,14 @@ if ( init_with != "last") :
                 epochs=10,
                 layers='heads')
 
-# Training - Stage 2
-# Finetune layers from ResNet stage 4 and up
-print("Training Resnet layer 3+")
-model.train(dataset_train, dataset_val,
-            learning_rate=config.LEARNING_RATE/10,
-            epochs=100,
-            layers='3+')
-
-# Training - Stage 3
+    # Training - Stage 2
+    # Finetune layers from ResNet stage 4 and up
+    print("Training Resnet layer 3+")
+    model.train(dataset_train, dataset_val,
+                learning_rate=config.LEARNING_RATE/10,
+                epochs=100,
+                layers='3+')
+    
 # Finetune layers from ResNet stage 3 and up
 print("Training all")
 model.train(dataset_train, dataset_val,

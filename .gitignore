@@ -1,6 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
-temp/
+anomaly/
 *.py[cod]
 *$py.class
 all.log
@@ -13,3 +13,4 @@ kernel*.json
 *.jpeg
 *.jpg
 *.h5
+all.log

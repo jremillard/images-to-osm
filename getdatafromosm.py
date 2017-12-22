@@ -55,4 +55,12 @@ queryMA = """[timeout:125];
     """
 saveOsmData(queryMA)
     
+# Other possible data to query
+#  - bridges
+#  - solar panels farms
+#  - wind turbines 
+#  - rail road crossings. 
+#  - active rail roads 
+#  - water tanks
+
 print(summary)

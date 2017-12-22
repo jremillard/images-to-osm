@@ -45,9 +45,9 @@ for classDir in os.listdir(cfg.rootOsmDir) :
 
                 pts.append(pixel)
 
-            poly = geometry.Polygon(pts);
+            poly = geometry.Polygon(pts)
 
-            areaMeters = poly.area * 0.596 *0.596;
+            areaMeters = poly.area * 0.596 *0.596
 
             # don't learn against baseball fields that are outlines just on the
             # diamond. They are tagged wrong, don't want to teach the NN that this 
@@ -136,21 +136,21 @@ for root, subFolders, files in os.walk(cfg.rootTileDir):
 
                     if ( area > 0 and newArea/area > minFeatureClip) :
 
-                        if (os.path.exists( "%s/%05d" % (cfg.trainDir,imageWriteCounter) ) == False) :
-                            os.mkdir( "%s/%05d" % (cfg.trainDir,imageWriteCounter) )
+                        if (os.path.exists( "%s/%06d" % (cfg.trainDir,imageWriteCounter) ) == False) :
+                            os.mkdir( "%s/%06d" % (cfg.trainDir,imageWriteCounter) )
                         
                         featureMask.fill(0)
                         rr, cc = draw.polygon(xs,ys,(maxImageSize,maxImageSize))
                         featureMask[cc,rr] = 255
-                        io.imsave("%s/%05d/%05d-%s-%d.png" % (cfg.trainDir,imageWriteCounter,imageWriteCounter,featureType,featureCount),featureMask)
+                        io.imsave("%s/%06d/%06d-%s-%d.png" % (cfg.trainDir,imageWriteCounter,imageWriteCounter,featureType,featureCount),featureMask)
                         usedFileNames.append( feature['filename'] )
                         featureCount += 1
                         featureCountTotal += 1
 
         if ( featureCountTotal > 0) :
-            io.imsave("%s/%05d/%05d.jpg" % (cfg.trainDir,imageWriteCounter,imageWriteCounter),image,quality=100)
+            io.imsave("%s/%06d/%06d.jpg" % (cfg.trainDir,imageWriteCounter,imageWriteCounter),image,quality=100)
             
-            with open("%s/%05d/%05d.txt" % (cfg.trainDir,imageWriteCounter,imageWriteCounter), "wt") as text_file:
+            with open("%s/%06d/%06d.txt" % (cfg.trainDir,imageWriteCounter,imageWriteCounter), "wt") as text_file:
                 text_file.write( "%s\n" % (str(qkRoot)))
                 text_file.write( "%0.8f,%0.8f\n" % qkRoot.to_geo())
                 for f in usedFileNames :
