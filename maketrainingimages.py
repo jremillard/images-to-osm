@@ -45,15 +45,9 @@ for classDir in os.listdir(cfg.rootOsmDir) :
 
                 pts.append(pixel)
 
-<<<<<<< HEAD
             poly = geometry.Polygon(pts)
 
             areaMeters = poly.area * 0.596 *0.596
-=======
-            poly = geometry.Polygon(pts);
-
-            areaMeters = poly.area * 0.596 *0.596;
->>>>>>> 164438af2d762a9932100dcebc35a277be1004d9
 
             # don't learn against baseball fields that are outlines just on the
             # diamond. They are tagged wrong, don't want to teach the NN that this 
