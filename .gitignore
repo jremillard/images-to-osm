@@ -1,6 +1,10 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+<<<<<<< HEAD
 anomaly/
+=======
+temp/
+>>>>>>> 164438af2d762a9932100dcebc35a277be1004d9
 *.py[cod]
 *$py.class
 all.log
