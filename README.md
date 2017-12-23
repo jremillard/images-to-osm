@@ -44,13 +44,13 @@ The entire training workflow is in the trainall.py script, which calls the follo
 
 ## Convert Results to OSM File
 
-5. createosmanomaly.py, runs the trained network and suggests changes to OSM. 
-    - The script generates final OSM ways using the masks. It fits perfect rectangles for non baseball fields and pie shaped ways for baseball fields. 
-    - Simplified contours of the baseball ways are also be emitted, sometimes the contour of the mask is superior to the fitted pie shape.
-    - TODO - If the clocking problem on the baseball fields are not fixed, emit several different clockings
-    - This script is slow and requires that it be run over 24+ hour period.
-6. The reviewosmanomaly.py is run next to visually approve or reject the changes suggested in the anomaly directory. Note this is the only script that requires user interaction. For every cluster of features. the user must inspect the image and approve or reject changes suggested by createosmanomaly.py. 
-7. TODO - The createosmimport.py creates the final osm files from the anomaly review done by reviewosmanomaly.py.
+5. createosmanomaly.py, runs the trained network and suggests changes to OSM. The script generates final OSM ways using the masks. 
+   It fits perfect rectangles for non baseball fields and wedge shapes for baseball fields. This script is
+   slow because of the shape fitting and requires that it be run over 35+ hour period.
+6. The reviewosmanomaly.py is run next to visually approve or reject the changes suggested in the anomaly directory. Note this is 
+    the only script that requires user interaction. For every cluster of features. the user must inspect the image and 
+    approve or reject changes suggested by createosmanomaly.py. 
+7. The createfinalosm.py creates the final osm files from the anomaly review done by reviewosmanomaly.py.
 
 ## Configuration 
 
