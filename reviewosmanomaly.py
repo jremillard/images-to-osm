@@ -7,6 +7,7 @@ import QuadKey.quadkey as quadkey
 import shapely.geometry as geometry
 import matplotlib.pyplot as plt
 import skimage.io
+import shutil
 
 def _find_getch():
     try:
@@ -33,9 +34,10 @@ def _find_getch():
 getch = _find_getch()
 
 
-# read in OSM files, convert to pixels z18, make them shapely polygons
-
 addDirectory = os.path.join( "anomaly","add","*.osm")
+anomalyStatusFile = os.path.join( "anomaly","status.csv")
+
+# read in OSM files, convert to pixels z18, make them shapely polygons
 
 newWays = {}
 for osmFileName in glob.glob(addDirectory): 
@@ -71,11 +73,14 @@ for osmFileName in glob.glob(addDirectory):
         newWays[osmFileName] = newEntry
 
 # read in review file, file status (accepted or rejected), path to osm 
-
-# for each add way that 
+if ( os.path.exists(anomalyStatusFile)):
+    with open(anomalyStatusFile,"rt",encoding="ascii") as f: 
+        for line in f:
+            (status,osmFileName) =  line.split(',')
+            osmFileName = osmFileName.strip()
+            newWays[osmFileName]['status'] = status
 
 fig = plt.figure()
-
 
 for wayKey in sorted(newWays):
     # if reviewed skip
@@ -83,9 +88,9 @@ for wayKey in sorted(newWays):
 
     if ( len(way['status']) == 0 ) :
 
-        # for each way, check for overlap, same tags, add to review cluster 
+        # for each way, check for overlap, same tags, add to review cluster, handle more ways than maxSubPlots
         subPlotCols = 2
-        subPlotRows = 1
+        subPlotRows = 2
         maxSubPlots = subPlotCols*subPlotRows
 
         reviewSet = [way]
@@ -94,6 +99,11 @@ for wayKey in sorted(newWays):
             if ( other != way and len(other['status']) == 0 and way['tags'] == other['tags'] and other['geometry'].intersects( way['geometry'])):
                 reviewSet.append(other)
 
+        for wayIndex in range(len(reviewSet)):
+            other = reviewSet[wayIndex]
+            other['status'] = 'rejected'
+
+        acceptedWay = {}
         viewSet = []
         for wayIndex in range(len(reviewSet)):
             viewSet.append(reviewSet[wayIndex])
@@ -106,26 +116,48 @@ for wayKey in sorted(newWays):
 
                 for wayIndex in range(len(viewSet)):
                     fig.add_subplot(subPlotRows,subPlotCols,wayIndex+1)
-                    plt.title(viewSet[wayIndex]['osmFile'])
+                    plt.title("{} {}".format(wayIndex+1,viewSet[wayIndex]['osmFile']))
                     image = skimage.io.imread( viewSet[wayIndex]['imageName'])
                     plt.imshow(image)
-                    viewSet[wayIndex]['status'] = 'rejected'
 
                 plt.show(block=False)
                 plt.pause(0.05)
 
-                getch()
+                goodInput = False
+                while goodInput  == False:
+                    print("{} - q to quit, 0 to reject all, to except use sub plot index".format(way['osmFile']))
+                    c = getch()
 
-                viewSet = [ reviewSet[0] ]
+                    try:
+                        index = int(c)
+                        if ( index > 0):
+                            acceptedWay = viewSet[index-1 ]
+                            viewSet = [acceptedWay]
+                            print("selected {} {}".format(acceptedWay['osmFile'],index))
+                            goodInput = True
+                        if ( index == 0):
+                            viewSet = [reviewSet[0]]
+                            acceptedWay = {}
+                            print("reject all")
+                            goodInput = True
+                                                    
+                    except:
+                        if ( c == "q"):
+                            sys.exit(0)
+                        print("what??")
+
+        if ( bool(acceptedWay) ) :
+            acceptedWay['status'] = 'accepted'
+            print("accepted {}".format(acceptedWay['osmFile']))
         
+        if ( os.path.exists(anomalyStatusFile+".1")):
+            shutil.copy(anomalyStatusFile+".1",anomalyStatusFile+".2" )
+        if ( os.path.exists(anomalyStatusFile)):
+            shutil.copy(anomalyStatusFile,anomalyStatusFile+".1" )
 
-  # read in diagnostic images from review cluster
-  # display up to 9 images 
-  # get choice (r reject call, 1-9 to accept, ask again if other, q quit)
-  #  if > 9 images and an image was selected bring it forward, keep looping
-  # update review file, reject and accept flags for each way in review cluster
-
-
-
-
+        with open(anomalyStatusFile,"wt",encoding="ascii") as f: 
+            for otherKey in sorted(newWays):
+                other = newWays[otherKey]
+                if ( len(other['status']) > 0 ):
+                    f.write("{},{}\n".format(other['status'],other['osmFile']))
 
