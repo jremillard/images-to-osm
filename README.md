@@ -54,10 +54,10 @@ The entire training workflow is in the trainall.py script, which calls the follo
 
 ## Configuration 
 
-1. Ubuntu 17.10
-2. A Bing key, create a secrets.py file, add in bingKey ="your key"
-3. Create a virtual environment python 3.6 
-4. In the virtual environment, run "pip install -r requirements.txt"
-5. TensorFlow 1.3+ 
-6. Keras 2.0.8+.
+- Ubuntu 17.10
+- A Bing key, create a secrets.py file, add in bingKey ="your key"
+- Create a virtual environment python 3.6 
+- In the virtual environment, run "pip install -r requirements.txt"
+- TensorFlow 1.3+ 
+- Keras 2.0.8+.
 

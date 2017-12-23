@@ -22,6 +22,11 @@ import time
 from skimage import draw
 from skimage import io
 
+showFigures = False
+
+def toDegrees(rad):
+  return rad * 180/math.pi
+
 def writeOSM( osmFileName,featureName, simpleContour,tilePixel, qkRoot) :
     with open(osmFileName,"wt",encoding="ascii") as f: 
         f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
@@ -45,31 +50,44 @@ def writeOSM( osmFileName,featureName, simpleContour,tilePixel, qkRoot) :
         f.write("</osm>\n")   
         f.close             
 
+def writeShape(wayNumber, finalShape, image, bbTop,bbHeight,bbLeft,bbWidth) :
+    nPts = int(finalShape.length)
+    if ( nPts > 5000) :
+        nPts = 5000
+    fitContour = np.zeros((nPts,1,2), dtype=np.int32)
 
+    if ( nPts > 3):
 
-def _find_getch():
-    try:
-        import termios
-    except ImportError:
-        # Non-POSIX. Return msvcrt's (Windows') getch.
-        import msvcrt
-        return msvcrt.getch
+        for t in range(0,nPts) :
+            pt = finalShape.interpolate(t)
+            fitContour[t,0,0] = pt.x
+            fitContour[t,0,1] = pt.y
+            
+        fitContour = [ fitContour ]
+        fitContour = [ cv2.approxPolyDP(cnt,2,True) for cnt in fitContour]
+                        
+        image = np.copy(imageNoMasks)
+        cv2.drawContours(image, fitContour,-1, (0,255,0), 2)
+        if ( showFigures ):
+            fig.add_subplot(2,2,3)
+            plt.title(featureName + " " + str(r['scores'][i]) + " Fit")
+            plt.imshow(image[bbTop:bbTop+bbHeight,bbLeft:bbLeft+bbWidth])
 
-    # POSIX system. Create and return a getch that manipulates the tty.
-    import sys, tty
-    def _getch():
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        try:
-            tty.setraw(fd)
-            ch = sys.stdin.read(1)
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-        return ch
+        while ( os.path.exists( "anomaly/add/{0:06d}.osm".format(wayNumber) )) :
+            wayNumber += 1
 
-    return _getch
+        debugFileName = os.path.join( inference_config.ROOT_DIR, "anomaly","add","{0:06d}.jpg".format(wayNumber))
+        io.imsave(debugFileName,image[bbTop:bbTop+bbHeight,bbLeft:bbLeft+bbWidth],quality=100)
 
-getch = _find_getch()
+        osmFileName = os.path.join( inference_config.ROOT_DIR, "anomaly","add","{0:06d}.osm".format(wayNumber))
+        writeOSM( osmFileName,featureName, fitContour[0],tilePixel, qkRoot)
+
+    if (showFigures ):
+        plt.show(block=False)
+        plt.pause(0.05)
+
+    return wayNumber
+    
 
 
 ROOT_DIR_ = os.path.dirname(os.path.realpath(sys.argv[0]))
@@ -153,7 +171,6 @@ if ( not os.path.isdir("anomaly/replace")) :
 if ( not os.path.isdir("anomaly/overlap")) :
     os.mkdir("anomaly/overlap")
 
-showFigures = False
 fig = {}
 if ( showFigures):
     fig = plt.figure()
@@ -316,14 +333,16 @@ for image_index in dataset_full.image_ids :
 
                 simpleContour = simpleContour[0]
                 
-                if ( featureName == "baseball" and isinstance(simpleContour,list) ):
-                    while ( os.path.exists( "anomaly/add/{}.osm".format(wayNumber) )) :
+                print("  {}".format(featureName))
+                if ( featureName == "baseball" and isinstance(simpleContour,np.ndarray) ):
+                    
+                    while ( os.path.exists( "anomaly/add/{0:06d}.osm".format(wayNumber) )) :
                         wayNumber += 1
 
-                    debugFileName = os.path.join( inference_config.ROOT_DIR, "anomaly","add","{}.jpg".format(wayNumber))
+                    debugFileName = os.path.join( inference_config.ROOT_DIR, "anomaly","add","{0:06d}.jpg".format(wayNumber))
                     io.imsave(debugFileName,image[bbTop:bbTop+bbHeight,bbLeft:bbLeft+bbWidth],quality=100)
 
-                    osmFileName = os.path.join( inference_config.ROOT_DIR, "anomaly","add","{}.osm".format(wayNumber))
+                    osmFileName = os.path.join( inference_config.ROOT_DIR, "anomaly","add","{0:06d}.osm".format(wayNumber))
                     writeOSM( osmFileName,featureName, simpleContour,tilePixel, qkRoot)
 
                 fitContour = simpleContour
@@ -352,7 +371,7 @@ for image_index in dataset_full.image_ids :
                         fitShape = geometry.LineString(pts)
 
                         fitShape = affinity.translate(fitShape, -width/2,-width/2 )
-                        fitShape = affinity.rotate(fitShape,angle,use_radians=True )
+                        fitShape = affinity.rotate(fitShape,angle )
                         fitShape = affinity.translate(fitShape, centerX,centerY )
 
                         return fitShape
@@ -377,29 +396,38 @@ for image_index in dataset_full.image_ids :
                     
                     cm = np.mean( rawContours[0],axis=0)
 
-                    result = {}
+                    results = []
                     angleStepCount = 8
                     for angleI in range(angleStepCount):
                         
                         centerX = cm[0,0]
                         centerY = cm[0,1]
                         width = math.sqrt(cv2.contourArea(rawContours[0]))
-                        angle = 2*math.pi * float(angleI)/angleStepCount
+                        angle = 360 * float(angleI)/angleStepCount
                         x0 = np.array([centerX,centerY,width,angle ])
                                                 
                         resultR = scipy.optimize.minimize(fitPie, x0, method='nelder-mead', options={'xtol': 1e-6,'maxiter':50 })
 
-                        if ( angleI == 0):                            
-                            result = resultR
+                        results.append(resultR)
 
-                        if ( resultR.fun < result.fun):
-                            result = resultR
-                        #print("{} {}".format(angle * 180.0 / math.pi,resultR.fun ))
+                    bestScore = 1e100
+                    bestResult = {}
+                    for result in results:
+                        if result.fun < bestScore :
+                            bestScore  = result.fun
+                            bestResult = result
 
-                    resultR = scipy.optimize.minimize(fitPie, resultR.x, method='nelder-mead', options={'xtol': 1e-6 })
+                    bestResult = scipy.optimize.minimize(fitPie, bestResult.x, method='nelder-mead', options={'xtol': 1e-6 })
+                    finalShape = makePie(bestResult.x)
+                    wayNumber = writeShape(wayNumber, finalShape, image, bbTop,bbHeight,bbLeft,bbWidth) 
 
-                    #print(result)
-                    finalShape = makePie(result.x)
+                    for result in results:
+                        angle = result.x[3]
+                        angleDelta = int(math.fabs(result.x[3]-bestResult.x[3])) % 360
+                        if result.fun < 1.2*bestScore and angleDelta > 45  :
+                            result = scipy.optimize.minimize(fitPie, result.x, method='nelder-mead', options={'xtol': 1e-6 })
+                            finalShape = makePie(result.x)
+                            wayNumber = writeShape(wayNumber, finalShape, image, bbTop,bbHeight,bbLeft,bbWidth) 
 
                 else:
 
@@ -457,41 +485,10 @@ for image_index in dataset_full.image_ids :
 
                     #print(result)
                     finalShape = makeRect(result.x)
-
-                nPts = int(finalShape.length)
-                if ( nPts > 5000) :
-                    nPts = 5000
-                fitContour = np.zeros((nPts,1,2), dtype=np.int32)
                 
-                if ( nPts > 3):
+                    wayNumber = writeShape(wayNumber, finalShape, image, bbTop,bbHeight,bbLeft,bbWidth) 
 
-                    for t in range(0,nPts) :
-                        pt = finalShape.interpolate(t)
-                        fitContour[t,0,0] = pt.x
-                        fitContour[t,0,1] = pt.y
-                        
-                    fitContour = [ fitContour ]
-                    fitContour = [ cv2.approxPolyDP(cnt,2,True) for cnt in fitContour]
-                                    
-                    image = np.copy(imageNoMasks)
-                    cv2.drawContours(image, fitContour,-1, (0,255,0), 2)
-                    if ( showFigures ):
-                        fig.add_subplot(2,2,3)
-                        plt.title(featureName + " " + str(r['scores'][i]) + " Fit")
-                        plt.imshow(image[bbTop:bbTop+bbHeight,bbLeft:bbLeft+bbWidth])
 
-                    while ( os.path.exists( "anomaly/add/{}.osm".format(wayNumber) )) :
-                        wayNumber += 1
-
-                    debugFileName = os.path.join( inference_config.ROOT_DIR, "anomaly","add","{}.jpg".format(wayNumber))
-                    io.imsave(debugFileName,image[bbTop:bbTop+bbHeight,bbLeft:bbLeft+bbWidth],quality=100)
-
-                    osmFileName = os.path.join( inference_config.ROOT_DIR, "anomaly","add","{}.osm".format(wayNumber))
-                    writeOSM( osmFileName,featureName, fitContour[0],tilePixel, qkRoot)
-
-                if (showFigures ):
-                    plt.show(block=False)
-                    plt.pause(0.05)
 
                 
                 

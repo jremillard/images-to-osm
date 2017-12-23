@@ -59,8 +59,14 @@ saveOsmData(queryMA)
 #  - bridges
 #  - solar panels farms
 #  - wind turbines 
-#  - rail road crossings. 
+#  - railroad crossings. 
 #  - active rail roads 
 #  - water tanks
+#  - wafer/lakes/rivers
+#  - parking lots
+#  - driveways 
+#  - gas stations 
+#  - building (Microsoft has already done this)
+#  - Running track
 
 print(summary)
