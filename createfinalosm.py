@@ -53,7 +53,7 @@ if ( os.path.exists(anomalyStatusFile)):
 
                 # only only allows 10,000 elements in a single change set upload, make different osm file
                 # so they can be uploaded without blowing up.
-                if ( startId > 9000) :
+                if ( startId > 9500) :
                     tree = ET.ElementTree(osmTreeRoot)
                     tree.write( makeOsmFileName(fileCount))
                     fileCount += 1
