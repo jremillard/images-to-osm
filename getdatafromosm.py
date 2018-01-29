@@ -18,7 +18,7 @@ def saveOsmData(query) :
 
         csvDirectoryName = os.path.join(cfg.rootOsmDir,featureDirectoryName)
         if ( os.path.exists(csvDirectoryName) == False):
-            os.mkdir( csvDirectoryName)
+            os.makedirs(csvDirectoryName)
 
         if ( (featureDirectoryName in summary) == False) :
             summary[featureDirectoryName]  = 1
