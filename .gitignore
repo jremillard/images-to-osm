@@ -10,6 +10,8 @@ logs
 kernel*.json
 
 *.csv
+*.GeoJSON
+*.patch
 *.jpeg
 *.jpg
 *.h5
