@@ -1,3 +1,0 @@
-[submodule "Mask_RCNN"]
-	path = Mask_RCNN
-	url = https://github.com/matterport/Mask_RCNN.git
