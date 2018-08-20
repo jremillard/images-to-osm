@@ -12,7 +12,6 @@ import imagestoosm.secrets as secrets
 from random import random
 from time import sleep
 
-#secret = "AoxxDlszQe-XFNd6IwlrrjxrtI3Ow-nDn84RIJ5as5HyGvJzERJuA2eiG22GHElt"
 # MS doesn't want you hardcoding the URLs to the tile server. This request asks for the Aerial
 # url template. Replace {quadkey}, and {subdomain}
 response = requests.get("https://dev.virtualearth.net/REST/V1/Imagery/Metadata/Aerial?key=%s" % (secrets.bingKey))
@@ -38,11 +37,9 @@ for classDir in os.listdir(cfg.rootOsmDir) :
             fullPath = os.path.join( cfg.rootOsmDir,classDir,fileName)
             with open(fullPath, "rt") as csvfile:
                 csveader = csv.reader(csvfile, delimiter='\t')
-                print("%s " % (fullPath),end='')
 
                 neededTile = False
                 for row in csveader:
-                    print(row)
                     tilePixel = quadkey.TileSystem.geo_to_pixel((float(row[0]),float(row[1])), cfg.tileZoom)
 
                     for x in range(-2,3) :
