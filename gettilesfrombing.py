@@ -33,51 +33,48 @@ if ( os.path.exists(bingTilesDir) == False) :
 for classDir in os.listdir(cfg.rootOsmDir) :
     classDirFull = os.path.join( cfg.rootOsmDir,classDir)
     for fileName in os.listdir(classDirFull) :
-        fullPath = os.path.join( cfg.rootOsmDir,classDir,fileName)
-        with open(fullPath, "rt") as csvfile:
-            csveader = csv.reader(csvfile, delimiter='\t')
-            print("%s " % (fullPath),end='')
+        if fileName.endswith(".csv"):
+            fullPath = os.path.join( cfg.rootOsmDir,classDir,fileName)
+            with open(fullPath, "rt") as csvfile:
+                csveader = csv.reader(csvfile, delimiter='\t')
 
-            neededTile = False
-            for row in csveader:
+                neededTile = False
+                for row in csveader:
+                    tilePixel = quadkey.TileSystem.geo_to_pixel((float(row[0]),float(row[1])), cfg.tileZoom)
 
-                tilePixel = quadkey.TileSystem.geo_to_pixel((float(row[0]),float(row[1])), cfg.tileZoom)
+                    for x in range(-2,3) :
+                        for y in range(-2,3) :
+                            pixel = ( tilePixel[0] + 256*x, tilePixel[1]+256*y)
+                            geo = quadkey.TileSystem.pixel_to_geo(pixel, cfg.tileZoom)
+                            qk = quadkey.from_geo(geo,cfg.tileZoom)
 
-                for x in range(-2,3) :
-                    for y in range(-2,3) :
-                        pixel = ( tilePixel[0] + 256*x, tilePixel[1]+256*y)
-                        geo = quadkey.TileSystem.pixel_to_geo(pixel, cfg.tileZoom)
-                        qk = quadkey.from_geo(geo,cfg.tileZoom)
+                            qkStr = str(qk)
 
-                        qkStr = str(qk)
+                            tileCacheDir = os.path.join(bingTilesDir,qkStr[-3:])
+                        
+                            if ( os.path.exists(tileCacheDir) == False) :
+                                os.mkdir( tileCacheDir)
 
-                        tileCacheDir = os.path.join(bingTilesDir,qkStr[-3:])
-                    
-                        if ( os.path.exists(tileCacheDir) == False) :
-                            os.mkdir( tileCacheDir)
+                            tileFileName = "%s/%s.jpg" % (tileCacheDir, qkStr)
 
-                        tileFileName = "%s/%s.jpg" % (tileCacheDir, qkStr)
+                            if ( os.path.exists(tileFileName) ) :                            
+                                # already downloaded
+                                ok = 1; 
+                            else :
+                                print("T",end='')
+                                url = tileUrlTemplate.replace("{subdomain}",imageDomains[0])
+                                url = url.replace("{quadkey}",qkStr)
+                                url = "%s&key=%s" % (url,secrets.bingKey)
 
-                        if ( os.path.exists(tileFileName) ) :                            
-                            # already downloaded
-                            ok = 1; 
-                        else :
-                            print("T",end='')
-                            url = tileUrlTemplate.replace("{subdomain}",imageDomains[0])
-                            url = url.replace("{quadkey}",qkStr)
-                            url = "%s&key=%s" % (url,secrets.bingKey)
+                                response = requests.get(url,stream=True)
+                                
+                                with open(tileFileName,'wb') as out_file:
+                                    shutil.copyfileobj(response.raw, out_file)
 
-                            response = requests.get(url,stream=True)
-                            
-                            with open(tileFileName,'wb') as out_file:
-                                shutil.copyfileobj(response.raw, out_file)
-
-                            del response
-                            neededTile = True
-                    
-            print("")
+                                del response
+                                neededTile = True
+                        
+                print("")
             
             if ( neededTile ):
                 sleep(random()*3)
-
-
