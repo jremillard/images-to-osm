@@ -110,7 +110,7 @@ usb-creator==0.3.3
 virtualenv==15.1.0
 wadllib==1.3.2
 wcwidth==0.1.7
-Werkzeug==0.12.2
+Werkzeug==0.15.3
 widgetsnbextension==3.0.7
 xkit==0.0.0
 zope.interface==4.3.2
