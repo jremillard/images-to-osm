@@ -1,6 +1,6 @@
 apturl==0.5.2
 asn1crypto==0.22.0
-bleach==1.5.0
+bleach==3.1.4
 Brlapi==0.6.5
 certifi==2017.4.17
 chardet==3.0.4
