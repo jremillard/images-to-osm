@@ -71,7 +71,7 @@ ptyprocess==0.5.2
 pycocotools==2.0
 pycrypto==2.6.1
 pycups==1.9.73
-Pygments==2.2.0
+Pygments==2.7.4
 pygobject==3.24.1
 pyparsing==2.1.10
 pyproj==1.9.5.1
