@@ -84,7 +84,7 @@ pyxdg==0.25
 PyYAML==3.12
 pyzmq==16.0.3
 qtconsole==4.3.1
-reportlab==3.4.0
+reportlab==3.5.55
 requests==2.18.1
 scikit-image==0.13.0
 scipy==0.18.1
