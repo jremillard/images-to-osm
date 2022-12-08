@@ -2,7 +2,7 @@ apturl==0.5.2
 asn1crypto==0.22.0
 bleach==1.5.0
 Brlapi==0.6.5
-certifi==2017.4.17
+certifi==2022.12.7
 chardet==3.0.4
 click==6.7
 click-plugins==1.0.3
